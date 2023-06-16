@@ -1,0 +1,8 @@
+build/*
+dist/*
+narrative_graph_representations.egg-info/*
+resources/*
+*.lp
+data/*
+settings/private.py
+src/framester/extract_info.py

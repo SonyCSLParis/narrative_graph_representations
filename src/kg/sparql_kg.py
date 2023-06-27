@@ -85,7 +85,7 @@ class SPARQLInterface:
         df.columns = ["frame_framester", "frame_framenet"]
         res = list(df.frame_framenet.values)
 
-        dbpedia_yago = [node_info for node_info in nodes_info if not node_info[1]]
+        dbpedia_yago = [node_info[0] for node_info in nodes_info if not node_info[1]]
         query = self.tq_frames_from_dbpedia_yago.replace(
             "<to-change>", " ".join([f"<{x}>" for x in dbpedia_yago]))
         df = self.run_query(query=query)
@@ -106,6 +106,7 @@ class SPARQLInterface:
         response = requests.get(
             self.sparql_endpoint, headers=self.headers,
             params={"query": query}, timeout=3600)
+        # print(response.url)
         return pd.read_csv(io.StringIO(response.content.decode('utf-8')))
 
 """

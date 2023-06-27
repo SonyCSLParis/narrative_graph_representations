@@ -1,0 +1,10 @@
+skip_predicates: {"www.w3.org/1999/02/22-rdf-syntax-ns#type"}
+embedder: word2vec
+epochs: 10
+walker: random
+sampler: uniform
+max_depth: 4
+max_walk: 10
+with_reverse: false
+n_jobs: 2
+verbose: 1

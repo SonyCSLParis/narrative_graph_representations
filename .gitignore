@@ -6,3 +6,5 @@ resources/*
 data/*
 settings/private.py
 src/framester/extract_info.py
+**/__pycache__/**
+cached/*.pkl

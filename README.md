@@ -26,3 +26,5 @@ Repository organisation
 
 hdt+pybind11
 conda install -c numba llvmlite (for bertopic)
+
+conda install grpcio=1.43.0 -c conda-forge

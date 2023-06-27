@@ -23,7 +23,7 @@ class LinkingKGPipeline:
         type_node.extend(self.linguistic_kg.get_type_node(node))
         type_node = list(set(x for x in type_node if x not in self.discarded_types))
 
-        # Adding equivalent classes 
+        # Adding equivalent classes
         type_node = [(x, self.generic_kg.get_equivalent_class_yago(node=x)) for x in type_node]
         frames = self.linguistic_kg.get_frames(nodes_info=type_node)
         frame_elements = [self.linguistic_kg.get_frame_elements(frame=frame) for frame in frames]

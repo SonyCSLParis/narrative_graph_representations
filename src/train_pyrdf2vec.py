@@ -157,21 +157,7 @@ if __name__ == '__main__':
     EMBEDDINGS, _ = TRANSFORMER.fit_transform(KNOWLEDGE_GRAPH, ENTITIES)
     print(EMBEDDINGS)
     print(cosine_similarity(EMBEDDINGS))
+    update_cache(entities=ENTITIES, embeddings=EMBEDDINGS)
+    print("Saved embeddings successfully")
 
     
-    # ent1 = ["http://dbpedia.org/resource/Coup_of_18_Fructidor"]
-    # entities = ['https://w3id.org/framester/framenet/abox/frame/Change_of_leadership', 'https://w3id.org/framester/framenet/abox/frame/Intentionally_act', 'https://w3id.org/framester/framenet/abox/frame/Commonality', 'https://w3id.org/framester/framenet/abox/frame/Event']
-
-    # knowledge_graph=KG("http://localhost:7200/repositories/framester-4-0-0/")
-    # knowledge_graph.connector =GraphDBConnector(endpoint="http://localhost:7200/repositories/framester-4-0-0/")
-
-    # transformer = RDF2VecTransformer(
-    #         Word2Vec(epochs=10),
-    #         walkers=[RandomWalker(4, 10, UniformSampler(), with_reverse=False, n_jobs=2)],
-    #         verbose=1
-    #     )
-
-    # #Get our embeddings.
-    # embeddings, literals = transformer.fit_transform(knowledge_graph, ent1+entities)
-    # print(embeddings)
-    # print(cosine_similarity(embeddings))

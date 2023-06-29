@@ -2,10 +2,12 @@
 Training pyrdf2vec for config file with a local GraphDB endpoint
 """
 # -*- coding: utf-8 -*-
-import yaml
+import os
+import pickle
 import argparse
 import operator
 from urllib import parse
+import yaml
 import requests
 
 import pandas as pd
@@ -21,12 +23,12 @@ from pyrdf2vec.walkers import AnonymousWalker, CommunityWalker, HALKWalker, \
 from pyrdf2vec.samplers import ObjFreqSampler, ObjPredFreqSampler, \
     PredFreqSampler, PageRankSampler, Sampler, UniformSampler, WideSampler
 from pyrdf2vec.embedders import Embedder, FastText, Word2Vec
+from settings import FOLDER_PATH
 
 LABEL_TO_EMBEDDER = {
     'embedder': Embedder, 'fasttext': FastText,
     'word2vec': Word2Vec
 }
-
 
 LABEL_TO_WALKER = {
     'anonymous': AnonymousWalker, 'community': CommunityWalker,
@@ -107,6 +109,20 @@ def init_transformer(config):
         verbose=verbose
     )
 
+def update_cache(entities, embeddings):
+    """ Saving entity embeddings """
+    save_cache_file = os.path.join(FOLDER_PATH, "cached/graph_embedding.pkl")
+    if os.path.exists(save_cache_file):
+        with open(save_cache_file, "rb") as openfile:
+            cache = pickle.load(openfile)
+    else:
+        cache = {}
+
+    for i, entity in enumerate(entities):
+        cache[entity] = embeddings[i]
+
+    with open(save_cache_file, 'wb') as openfile:
+        pickle.dump(cache, openfile)
 
 
 
@@ -143,4 +159,19 @@ if __name__ == '__main__':
     print(cosine_similarity(EMBEDDINGS))
 
     
-    
+    # ent1 = ["http://dbpedia.org/resource/Coup_of_18_Fructidor"]
+    # entities = ['https://w3id.org/framester/framenet/abox/frame/Change_of_leadership', 'https://w3id.org/framester/framenet/abox/frame/Intentionally_act', 'https://w3id.org/framester/framenet/abox/frame/Commonality', 'https://w3id.org/framester/framenet/abox/frame/Event']
+
+    # knowledge_graph=KG("http://localhost:7200/repositories/framester-4-0-0/")
+    # knowledge_graph.connector =GraphDBConnector(endpoint="http://localhost:7200/repositories/framester-4-0-0/")
+
+    # transformer = RDF2VecTransformer(
+    #         Word2Vec(epochs=10),
+    #         walkers=[RandomWalker(4, 10, UniformSampler(), with_reverse=False, n_jobs=2)],
+    #         verbose=1
+    #     )
+
+    # #Get our embeddings.
+    # embeddings, literals = transformer.fit_transform(knowledge_graph, ent1+entities)
+    # print(embeddings)
+    # print(cosine_similarity(embeddings))

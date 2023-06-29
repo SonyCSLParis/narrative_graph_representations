@@ -4,6 +4,7 @@ Embedding-based methods to choose most meaningful frames for an event
 # -*- coding: utf-8 -*-
 import os
 import pickle
+from tqdm import tqdm
 from typing import List, Tuple
 
 import torch
@@ -15,7 +16,7 @@ from settings import FOLDER_PATH
 class EmbedderSimilarity:
     """ Comparing event to frames with embeddings """
 
-    def __init__(self, type_embedder: str, model: str):
+    def __init__(self, type_embedder: str):
         """
         type_embedder:
         -  `label`: using label from IRI to compare event and frames
@@ -54,8 +55,7 @@ class EmbedderSimilarity:
 class TextEmbedding(EmbedderSimilarity):
     """ Using text input to compare events and frames """
     def __init__(self, type_embedder: str, model: str = 'sentence-transformers/bert-base-nli-mean-tokens'):
-        EmbedderSimilarity.__init__(self, type_embedder=type_embedder,
-                                    model=model)
+        EmbedderSimilarity.__init__(self, type_embedder=type_embedder)
         self.model = SentenceTransformer(model)
 
     @staticmethod
@@ -90,16 +90,26 @@ class TextEmbedding(EmbedderSimilarity):
         similarities = util.pytorch_cos_sim(emb_event, emb_frames)
 
         self.save_cache()
-        return float(torch.max(similarities)), int(torch.argmax(similarities))
+        return similarities
     
+    def embed(self, nodes: List[Tuple[str, str]]):
+        """ Embedding and caching nodes content """
+        for i in tqdm(range(len(nodes))):
+            node = nodes[i]
+            self.get_encoding(iri=node[0], content=self.pre_process_text(node[1]))
+        self.save_cache()
+
+    @staticmethod
+    def get_most_similar_frame(similarities):
+        """ Most similar frame + index """
+        return float(torch.max(similarities)), int(torch.argmax(similarities))
 
 
 
 class GraphEmbedding(EmbedderSimilarity):
     """ Using graph input to compare events and frames """
     def __init__(self, type_embedder: str, model: str):
-        EmbedderSimilarity.__init__(self, type_embedder=type_embedder,
-                                    model=model)
+        EmbedderSimilarity.__init__(self, type_embedder=type_embedder)
 
 
 if __name__ == '__main__':
@@ -116,7 +126,8 @@ if __name__ == '__main__':
         'https://w3id.org/framester/framenet/abox/frame/Event'
     ]
     FRAMES = [(frame, frame.rsplit("/", maxsplit=1)[-1].replace('_', ' ')) for frame in FRAMES]
-    SIM, INDEX = EMBEDDER_SIMILARITY.compare(EVENT, FRAMES)
+    SIMILARITIES = EMBEDDER_SIMILARITY.compare(EVENT, FRAMES)
+    SIM, INDEX = EMBEDDER_SIMILARITY.get_most_similar_frame(similarities=SIMILARITIES)
     print(f"With labels\n{SIM}\t{INDEX}\t{FRAMES[INDEX][0]}\n===")
 
     ############################################################################################
@@ -138,5 +149,6 @@ if __name__ == '__main__':
     EMBEDDER_SIMILARITY = TextEmbedding(
         type_embedder="description",
         model='sentence-transformers/bert-base-nli-mean-tokens')
-    SIM, INDEX = EMBEDDER_SIMILARITY.compare(EVENT, FRAMES)
+    SIMILARITIES = EMBEDDER_SIMILARITY.compare(EVENT, FRAMES)
+    SIM, INDEX = EMBEDDER_SIMILARITY.get_most_similar_frame(similarities=SIMILARITIES)
     print(f"With descriptions\n{SIM}\t{INDEX}\t{FRAMES[INDEX][0]}\n===")

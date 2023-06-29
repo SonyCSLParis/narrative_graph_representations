@@ -57,6 +57,11 @@ class HDTKG:
         params = {"subject": node, "predicate": self.config["rdf_type"]}
         return [x[2] for x in self.get_triples(**params)]
 
+    def get_abstract(self, node: str, lang: str = 'en') -> List[str]:
+        """ Retrieve abstract of event in `lang` """
+        params = {"subject": node, "predicate": self.config["abstract"]}
+        return [x[2].replace(f"@{lang}", '')[1:-1] for x in self.get_triples(**params) if x[2].endswith(lang)]
+
     def get_equivalent_class_yago(self, node: str) -> List[str]:
         """ Map DBpedia YAGO IRI to YAGO Wordnet IRI (example below)
         <http://dbpedia.org/class/yago/Ability105616246> <http://www.w3.org/2002/07/owl#equivalentClass> <http://yago-knowledge.org/resource/wordnet_ability_105616246> .

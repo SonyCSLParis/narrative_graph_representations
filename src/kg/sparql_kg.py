@@ -70,11 +70,24 @@ class SPARQLInterface:
         }
         """
 
+        self.tq_comment_node = self.prefix_query + \
+        """
+        SELECT DISTINCT * WHERE {   
+            <node-to-change> rdfs:comment ?o .   
+        }
+        """
+
     def get_type_node(self, node: str):
         """ Retrieve rdf:type of input nodes """
         query = self.tq_type_node.replace("node-to-change", node)
         res = self.run_query(query)
         return (res.o.unique())
+
+    def get_comment_node(self, node: str):
+        """ Retrieve rdfs:comment of input nodes """
+        query = self.tq_comment_node.replace("node-to-change", node)
+        res = self.run_query(query)
+        return (res.o.unique()[0])
 
     def get_frames(self, nodes_info: Tuple[str, List[str]]):
         """ Retrieve frames """

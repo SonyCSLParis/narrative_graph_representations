@@ -58,8 +58,8 @@ class SPARQLInterface:
         """
         SELECT DISTINCT ?frame_element WHERE {
         <frame-to-change> framenet-tbox:hasFrameElement ?frame_element .
-        OPTIONAL {?frame_element rdfs:range ?range } .
-        OPTIONAL {?range rdfs:subClassOf ?super_range } .
+        # OPTIONAL {?frame_element rdfs:range ?range } .
+        # OPTIONAL {?range rdfs:subClassOf ?super_range } .
         } 
         """
 
@@ -87,7 +87,7 @@ class SPARQLInterface:
         """ Retrieve rdfs:comment of input nodes """
         query = self.tq_comment_node.replace("node-to-change", node)
         res = self.run_query(query)
-        return (res.o.unique()[0])
+        return res.o.unique()
 
     def get_frames(self, nodes_info: Tuple[str, List[str]]):
         """ Retrieve frames """
@@ -122,33 +122,6 @@ class SPARQLInterface:
         # print(response.url)
         return pd.read_csv(io.StringIO(response.content.decode('utf-8')))
 
-"""
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#> 
-PREFIX framester-schema: <https://w3id.org/framester/schema/> 
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX framenet-tbox: <https://w3id.org/framester/framenet/tbox/>
-PREFIX yago-res: <http://yago-knowledge.org/resource/>
-PREFIX wn30instances: <https://w3id.org/framester/wn/wn30/instances/> 
-PREFIX frame-abox-frame: <https://w3id.org/framester/framenet/abox/frame/>
-PREFIX frame-abox-semtype: <https://w3id.org/framester/framenet/abox/semType/>
-PREFIX framestesyn: <https://w3id.org/framester/data/framestersyn/>
-PREFIX framestercore: <https://w3id.org/framester/data/framestercore/>
-PREFIX framenet-abox-fe: <https://w3id.org/framester/framenet/abox/fe/>
-PREFIX do: <http://www.ontologydesignpatterns.org/ont/d0.owl#>
-PREFIX dul: <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#>
-PREFIX semiotics: <http://www.ontologydesignpatterns.org/cp/owl/semiotics.owl#>
-
-SELECT DISTINCT * WHERE {
-  yago-res:wordnet_revolution_107424109 owl:sameAs ?wn30instances_synset .
-  ?framestersyn_noun framester-schema:unaryProjection ?wn30instances_synset;
-                     rdfs:subClassOf ?frame_framester .
-  ?frame_framester owl:sameAs ?frame_framenet .
-  ?frame_framenet framenet-tbox:hasFrameElement ?frame_element .
-  ?frame_element rdfs:range ?range .
-  ?range rdfs:subClassOf ?super_range .
-} 
-"""
 
 if __name__ == '__main__':
     from settings import FRAMESTER_ENDPOINT

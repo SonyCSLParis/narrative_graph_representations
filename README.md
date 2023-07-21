@@ -28,3 +28,13 @@ hdt+pybind11
 conda install -c numba llvmlite (for bertopic)
 
 conda install grpcio=1.43.0 -c conda-forge
+
+full pipeline
+- retrieve_event_info.py: description, types, embeddings
+- map_type_to_frame.py: from type of events, extracting frames 
+- retrieve_frame_info.py: frame elements, description, embeddings
+- combine_event_frame_data.py
+- prompt_srl.py
+- build_graph.py
+
+Built into main

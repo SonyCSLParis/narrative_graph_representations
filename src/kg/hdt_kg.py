@@ -51,6 +51,11 @@ class HDTKG:
             triples.extend(curr_triples)
 
         return list(set(triples))
+    
+    def get_abstract(self, node: set) -> List[str]:
+        """ Retrieve abstract (text descriptions) of events """
+        params = {"subject": node, "predicate": self.config["abstract"]}
+        return [x[2] for x in self.get_triples(**params)]
 
     def get_type_node(self, node: str) -> List[str]:
         """ Retrieve type of nodes """

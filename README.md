@@ -38,3 +38,5 @@ full pipeline
 - build_graph.py
 
 Built into main
+
+python -m spacy download en_core_web_sm

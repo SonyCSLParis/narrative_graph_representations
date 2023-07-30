@@ -1,9 +1,10 @@
 """
-6th step of the pipeline: build the graph from info
+7th step of the pipeline: build the graph from info
 """
 # -*- coding: utf-8 -*-
 import argparse
 import pickle
+import pandas as pd
 from rdflib import Namespace, Graph, URIRef
 from rdflib.namespace import RDF 
 from src.logger import Logger
@@ -45,11 +46,15 @@ class GraphBuilder:
                 graph.add((URIRef(event), self.rdf.type, self.dul.Situation))
                 graph.add((URIRef(event), self.dul.satisfies, URIRef(frame)))
 
-                for _, row in info['srl'].iterrows():
-                    if row['role iri'] != "<unknown>":  # mapped to a DBpedia IRI
-                        graph.add((URIRef(row['role iri']), self.dul.hasSetting, URIRef(event)))
-                        fe_ = self.get_iri_frame_element(label=row['role name'], frame_name=frame)
-                        graph.add((URIRef(row['role iri']), self.dul.associatedWith, URIRef(fe_)))
+                if isinstance(info['srl'], pd.DataFrame):
+                    for _, row in info['srl'].iterrows():
+                        if (row['role iri'] != "<unknown>") and isinstance(row['role iri'], str):  # mapped to a DBpedia IRI
+                            roles = [x for x in row['role iri'].split(", ") if x.startswith("http")]
+                            for role in roles:
+                                role_iri = role.replace("<", "").replace(">", "")
+                                graph.add((URIRef(role_iri), self.dul.hasSetting, URIRef(event)))
+                                fe_ = self.get_iri_frame_element(label=row['role name'], frame_name=frame)
+                                graph.add((URIRef(role_iri), self.dul.associatedWith, URIRef(fe_)))
 
         return graph
 
@@ -71,7 +76,6 @@ class GraphBuilder:
 
         # Descriptions
         unique_des = self.get_unique_descriptions(events_info=events_info)
-        print(unique_des)
         graph = self.add_descriptions(graph=graph, descriptions_info=unique_des)
 
         # Situations
@@ -94,7 +98,7 @@ if __name__ == '__main__':
     GRAPH_BUILDER = GraphBuilder()
     LOGGER = Logger()
 
-    LOGGER.log_start(name="Prompt SRL + GPT")
+    LOGGER.log_start(name="Building graph")
     RES = GRAPH_BUILDER(events_info=EVENTS_INFO)
     LOGGER.log_end()
 

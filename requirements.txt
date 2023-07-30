@@ -17,3 +17,5 @@ plotly==5.15.0
 gensim==4.3.1
 aiohttp==3.8.4
 pyrdf2vec==0.2.3
+spacy==3.4.2
+spacy-dbpedia-spotlight==0.2.6

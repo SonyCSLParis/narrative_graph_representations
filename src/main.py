@@ -5,10 +5,12 @@ Running all the steps of the pipeline.
 import os
 import pickle
 import argparse
+from datetime import datetime
 import pandas as pd
 from src.logger import Logger
 from src.kg.hdt_kg import HDTKG
 from src.kg.sparql_kg import SPARQLInterface
+from src.enrich_srl import EnrichSRL
 from src.prompt_srl import PromptSRL
 from src.build_graph import GraphBuilder
 from src.map_type_to_frame import MapKGs
@@ -37,6 +39,7 @@ def get_cached(args):
 
 def main(args, cached):
     """ Run all steps """
+    start = datetime.now()
 
     # 1 - Event Info Retrieval
     event_info_retrieval = EventInfoRetrieval(generic_kg=GENERIC_KG, linguistic_kg=LINGUISTIC_KG,
@@ -85,19 +88,31 @@ def main(args, cached):
     # 5 - Prompting
     prompt_srl = PromptSRL()
     LOGGER.log_start(name="Prompt SRL + GPT")
-    events_info = prompt_srl(events_info=events_info)
+    events_info, _ = prompt_srl(events_info=events_info)
     LOGGER.log_end()
 
     with open(os.path.join(args["output"], "events_info_combined_srl.pkl"), "wb") as openfile:
         pickle.dump(events_info, openfile)
+    
+    # 6 - Enriching SRL Info (DBpedia Spotlight)
+    enrich_srl = EnrichSRL()
+    LOGGER.log_start(name="Enrich SRL post GPT")
+    events_info = enrich_srl(events_info=events_info)
+    LOGGER.log_end()
 
-    # 6 - Graph building
+    with open(os.path.join(args["output"], "events_info_final.pkl"), "wb") as openfile:
+        pickle.dump(events_info, openfile)
+
+    # 7 - Graph building
     graph_builder = GraphBuilder()
-    LOGGER.log_start(name="Prompt SRL + GPT")
+    LOGGER.log_start(name="Build graph")
     graph = graph_builder(events_info=events_info)
     LOGGER.log_end()
 
     graph.serialize(destination=os.path.join(args["output"], "kg.ttl"), format="turtle")
+
+    end = datetime.now()
+    print(f"Took {end-start}")
 
 
 if __name__ == '__main__':

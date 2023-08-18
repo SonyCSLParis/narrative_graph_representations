@@ -1,42 +1,73 @@
+# Structured Representations for Narratives
 
+This is the code for the paper submitted to K-CAP 2023: "Structured Representations for Narratives".
 
-ILP with Pulp to find which models to use to satisfy set of narrative concept requirement
+First clone the repo
+```bash
+git clone https://github.com/SonyCSLParis/narrative_graph_representations
+```
+---
+## 1. Set Up Virtual Environment
 
-F&A:
-* identified common concepts across several models + 6 projects across MUHAI
-* mapped these concepts to the models (does model X encode concept Y?)
+Python version used: 3.10.6. We recommend to use a virtual environment.
 
-I added other event ontologies and mapped them to the narrative concept
+Install the requirements:
+```bash
+pip install -r requirements.txt
+````
 
-Users chooses in .yaml
-* the narrative concepts they need for their representation (limitation: can only choose among the ones defined by us)
-* the models they want to keep (if for some reason they want to discard models, that's possible)
-
-First use: possible to generate the setting in a .yaml file, cf `src/ilp/generate_yaml_settings.py` --> by default everything will be set to 1, the user has to change the values 
-
-ILP program finds set of models to use, following these constraints:
-* each narrative concept should be encoded in at least of the selected models
-* the number of models used should be minimised (therefore will prefer model X that covers set of concepts A and B rather than model X1 that covers A and models X2 that covers B)
-
-Repository organisation
-* `data/`: concrete outputs
-* `resources/`: downloaded ontologies when looking for narrative concepts
-* `src/`: core code 
-
-
-hdt+pybind11
-conda install -c numba llvmlite (for bertopic)
-
-conda install grpcio=1.43.0 -c conda-forge
-
-full pipeline
-- retrieve_event_info.py: description, types, embeddings
-- map_type_to_frame.py: from type of events, extracting frames 
-- retrieve_frame_info.py: frame elements, description, embeddings
-- combine_event_frame_data.py
-- prompt_srl.py
-- build_graph.py
-
-Built into main
-
+Install the spacy model:
+```python
 python -m spacy download en_core_web_sm
+```
+
+Errors when installing:
+- For `hdt`, make sure to have `pybind11`` installed. Also make sure that you have installed the pre-requisites before: [here](https://github.com/Callidon/pyHDT).
+- For `bertopic`+`conda`, you might need to install llvmlite
+    ```bash
+    conda install -c numba llvmlite
+    ```
+- If you work on an Apple Silicon Machine + conda, you might later be prompted to download again `grpcio`, you can do it using:
+    ```bash
+    conda install grpcio=1.43.0 -c conda-forge
+    ```
+
+Create a `private.py` file in the settings folder and add the followings:
+* `FOLDER_PATH`: (of git repository on your machine)
+* `FRAMESTER_ENDPOINT`: Framester endpoint (either the public one, or a local endpoint)
+* `OPENAI_KEY`: OpenAI API key
+* `FOLDER_HDT_GEN_DB`: HDT path to main DBpedia
+* `FOLDER_HDT_GEN_DB_TYPES`: same as above, but for dbpedia extensive types
+
+Then run the following for setting up the packages
+```bash
+python setup.py install
+```
+---
+
+## 2. Data Download/Setup
+
+* [Triply DB](https://triply.cc)'s HDT version of DBpedia (snapshot 2021-09)
+* [Additional DBpedia types](https://databus.dbpedia.org/dbpedia/collections/dbpedia-snapshot-2022-03): dbpedia-instance-types_lang=en_specific.ttl, dbpedia-instance-types_lang=en_transitive.ttl, dbpedia-instance-types_tag=specific.ttl, dbpedia-sdtypes_lang=en.ttl 
+* [Framester](https://framester.github.io): We strongly recommend to set up a local API for Framester. We used GraphDB, and loaded it without reasoning.
+
+These can also be sent upon request.
+
+---
+## 3. Pipeline
+
+The `src/pipeline/main.py` file runs all the components in the pipeline.
+
+1. **Retrieve info about events**: `src/pipeline/retrieve_event_info.py`
+2. **Map DBpedia to Framester**: `src/pipeline/map_type_to_frame.py`
+3. **Retrieve info about frames**: `src/pipeline/retrieve_frame_info.py`
+4. **Combine info in a single file**: `src/pipeline/combine_event_frame_data.py`
+5. **Prompting using OpenAI LLM**: `src/pipeline/prompt_srl.py`
+6. **Run DBpedia Spotlight**: `src/pipeline/enrich_srl.py`
+7. **Build the graph**: `src/pipeline/build_graph.py`
+
+To run the pipeline, you need to have a `.csv` file with your DBpedia events, in an entity `column`.
+
+```python
+python src/pipeline/main.py -m <embedding-model> -i <input-event-csv-file> -o <output-folder>
+

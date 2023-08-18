@@ -1,0 +1,297 @@
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix dul: <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.com/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ti: <http://www.ontologydesignpatterns.org/cp/owl/timeinterval.owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wn30instances: <https://w3id.org/framester/wn/wn30/instances/> .
+@prefix own2dul: <http://www.ontologydesignpatterns.org/ont/own3/own2dul.owl#> .
+@prefix framesterschema: <https://w3id.org/framester/schema/> .
+@prefix framstersyn: <https://w3id.org/framester/data/framestersyn/> .
+@prefix framestercore: <https://w3id.org/framester/data/framestercore/> .
+@prefix framesterrole: <https://w3id.org/framester/data/framesterrole/agent> .
+@prefix framester-aboxfe: <https://w3id.org/framester/framenet/abox/fe/> .
+@prefix faro: <http://purl.org/faro/> .
+@prefix sioc: <http://rdfs.org/sioc/ns#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix wikipedia-en: <http://en.wikipedia.org/wiki/> .
+@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix schema: <http://schema.org/> .
+@prefix F: <http://isweb.uni-koblenz.de/eventmodel/> . 
+@prefix dbr: <http://dbpedia.org/resource/> .
+
+# agent
+
+
+## simple case with dul:hasParticipant (simple participation)
+dbr:Coup_of_18_Brumaire a dul:Action ;
+    rdfs:label "Coup of 18 Brumaire" ;
+    dul:hasParticipant dbr:Emmanuel_Joseph_Sieyès, dbr:Roger_Ducos, dbr:Paul_Barras, dbr:Louis-Jérôme_Gohier, wd:Q535515 ;
+    dul:isObservableAt "1799-11-09T00:00:00"^^xsd:dateTime .
+
+dbr:Emmanuel_Joseph_Sieyès a dul:Person ;
+    rdfs:label "Emmanuel Joseph Sieyès" .
+
+dbr:Roger_Ducos a dul:Person ;
+    rdfs:label "Roger Ducos" .
+
+dbr:Paul_Barras a dul:Person ;
+    rdfs:label "Paul Barras" .
+
+dbr:Louis-Jérôme_Gohier a dul:Person ;
+    rdfs:label "Louis-Jérôme Gohier" .
+
+wd:Q535515 a dul:Person ;
+    rdfs:label "Jean-François-Auguste Moulin" .
+
+
+
+## simple case with dul:involvesAgent = agent participation (agentive ~ active)
+dbr:Coup_of_18_Brumaire dul:involvesAgent dbr:Napoleon .
+
+dbr:Napoleon a dul:Person ;
+    rdfs:label "Napoleon" .
+
+## type: cf. sub-classes of dul:Agent/dul:PhysicalObject, eg dul:Person + further use domain-specific
+
+# role
+## Starting from FrameNet frame Change_of_leadership: https://framenet2.icsi.berkeley.edu/fnReports/data/frameIndex.xml?frame=Change_of_leadership
+## with frame: using the frame elements
+## alternative: through description and situation
+
+## Description: template
+ex:ChangeofLeadershipFrameDescription a dul:Description ;
+    # core
+    dul:definesRole framester-aboxfe:New_leader, framester-aboxfe:Old_leader, framester-aboxfe:Function,
+        framester-aboxfe:Old_order ;
+    dul:defines framester-aboxfe:ChangeOfLeadershipEventType .
+    
+wd:Q1131971 a dul:Concept ;
+    rdfs:label "First Consul" .
+framester-aboxfe:New_leader a dul:Role ;
+    dul:classifies dbr:Napoleon .
+framester-aboxfe:Old_leader a dul:Role ;
+    dul:classifies dbr:Emmanuel_Joseph_Sieyès, dbr:Roger_Ducos, dbr:Paul_Barras, dbr:Louis-Jérôme_Gohier, wd:Q535515 .
+framester-aboxfe:Old_order a dul:Role ;
+    dul:classifies ex:SocialAgent_French_Directory .
+framester-aboxfe:Function a dul:Role ;
+    dul:classifies wd:Q1131971 .
+framester-aboxfe:ChangeOfLeadershipEventType a dul:EventType ;
+    dul:classifies dbr:Coup_of_18_Brumaire .
+
+ex:TI-1 a dul:TimeInterval ;
+    ti:hasIntervalDate "1799-11-09T00:00:00"^^xsd:dateTime .
+
+## Situation --> dul:isSettingFor, dul:includesAction, dul:includesEvent, dul:includesAgent, dul:includesObject, dul:Time
+ex:ChangeofLeadershipFrameSituation a dul:Situation ;
+    dul:Time ex:TI-1 ;
+    dul:includesAction dbr:Coup_of_18_Brumaire ; # Coup of 18 Brumaire
+    dul:includesAgent dbr:Napoleon, dbr:Emmanuel_Joseph_Sieyès, dbr:Roger_Ducos, dbr:Paul_Barras, dbr:Louis-Jérôme_Gohier, wd:Q535515, 
+        ex:SocialAgent_French_Directory ; # Napoleon, Emmanuel Joseph Sieyès & other directors
+    dul:includesObject wd:Q1131971 ; # First Consul 
+    dul:satisfies ex:ChangeofLeadershipFrameDescription .
+
+
+
+ex:SocialAgent_French_Directory a dul:SocialAgent ; # could even be dul:CollectiveAgent
+    dul:associatedWith dbr:French_Directory ;
+    rdfs:label "[SA] French Directory" .
+
+dbr:French_Directory a dul:Entity ;
+    rdfs:label "French Directory" .
+
+wn30instances:synset-coup_d_etat-noun-1 own2dul:dul dul:Action .
+framstersyn:Coup_d_etat.n.1 framesterschema:unaryProjection wn30instances:synset-coup_d_etat-noun-1 ;
+    rdfs:subClassOf framestercore:ChangeOfLeadership, framestercore:Commonality, framesterschema:FrameOccurrence .
+
+framestercore:FrameOccurrence rdfs:subClassOf dul:Situation .
+framestercore:ChangeOfLeadership framesterschema:vnRole framesterrole:agent, 
+    framesterrole:eventuality, framesterrole:theme .
+
+
+# event/action (grouped together, with the following main difference: action is intentional, event can be spontaneous/natural)
+# dul:Event vs. dul:Action
+
+## relations between events/actions --> use the FARO ontology ? (only one that covers all temporal relations from Allen Calculus + from events and not time interval like TIME ontology)
+ex:Event_French_Directory a dul:Event ; # could even be dul:CollectiveAgent
+    dul:associatedWith dbr:French_Directory ;
+    rdfs:label "[E] French Directory" ;
+    faro:immediatly_before ex:Event_French_Consulate .
+
+ex:Event_French_Consulate a dul:Event ; # could even be dul:CollectiveAgent
+    dul:associatedWith dbr:French_Consulate ;
+    rdfs:label "[E] French Consulate" .
+
+dbr:French_Consulate a dul:Entity ;
+    rdfs:label "French Consulate" .
+
+ex:EventCausalitySituation_1 a dul:Situation ;
+    dul:satisfies F:EventCausalityDescription ;
+    dul:includesEvent dbr:Coup_of_18_Brumaire, ex:Event_French_Consulate ;
+    dul:includesObject ex:JustificationDescription .
+
+F:Cause a dul:EventType ;
+    dul:classifies dbr:Coup_of_18_Brumaire .
+
+F:Effect a dul:EventType ;
+    dul:classifies ex:Event_French_Consulate .
+
+ex:Wikidata a dul:Object ;
+    rdfs:label "Wikidata" .
+
+ex:JustificationDescription a dul:Description ;
+    dul:includesObject ex:Wikidata ;
+    dul:hasRole F:Justification .
+
+
+## type + hierarchy (latter: domain-specific)
+dbr:Coup_d%27état a dul:EventType ;
+    rdfs:label "coup d'état" ;
+    dul:classifies dbr:Coup_of_18_Brumaire . # coup of 18 Brumaire
+
+## conditions
+
+# provenance 
+# current version = with text data. Alternative =? named graph
+
+ex:Coup_of_18_Brumaire_Post a sioc:Post ;
+    sioc:content "[...] The Coup d'état of 18 Brumaire overthrew the Directory. [...]"^^xsd:Literal ;
+    prov:wasInformedBy <http://en.wikipedia.org/wiki/Coup_of_18_Brumaire> ;
+    nif:sentence ex:sentence_1 .
+
+ex:sentence_1 a nif:Sentence ;
+    rdf:value "The Coup d'état of 18 Brumaire overthrew the Directory." ;
+    schema:about dbr:Coup_of_18_Brumaire .
+
+# location
+dbr:Coup_of_18_Brumaire dul:hasLocation dbr:France .
+
+dbr:France a dul:Place ;
+    rdfs:label "France" .
+
+## relations between locations --> domain-specific ontologies
+
+# time-calculus --> same as faro
+
+# object + type --> 3 subclasses: social object, agent, physical object, and further subclasses
+# more detailed: using domain-specific ontologies
+
+dbr:Chair a dul:PhysicalObject ; # chair
+    rdfs:label "chair" ;
+    dul:isParticipantIn dbr:Coup_of_18_Brumaire . # coup d'état of 18 Brumaire
+
+
+
+
+# state
+
+ex:GovernmentDescription a dul:Description ;
+    dul:defines dbr:Government; # government
+    dul:introduces dbr:HistoricalCountry .  # historical country
+
+dbr:Government a dul:Concept ;
+    dul:classifies dbr:Directorial_system, dbr:Triumvirate .
+
+dbr:HistoricalCountry a dul:SocialAgent ;
+    dul:associatedWith ex:SocialAgent_French_First_Republic .
+
+dbr:Government rdfs:label "government" .
+dbr:HistoricalCountry rdfs:label "historical country" .
+
+ex:GovernmentSituation_1 a dul:Situation, dul:Event ;
+    dul:satisfies ex:GovernmentDescription ;
+    dul:Time ex:TI-2 ;
+    dul:includesAgent ex:SocialAgent_French_First_Republic ; # French First Republic
+    dul:includesObject dbr:Directorial_system . # directorial system
+
+ex:SocialAgent_French_First_Republic a dul:SocialAgent ; # could even be dul:CollectiveAgent
+    dul:associatedWith dbr:French_First_Republic ;
+    rdfs:label "[SA] French First Republic" .
+
+ex:Event_French_First_Republic a dul:Event ; # could even be dul:CollectiveAgent
+    dul:associatedWith dbr:French_First_Republic ;
+    rdfs:label "[E] French First Republic" .
+
+dbr:Directorial_system rdfs:label "directorial system" .
+
+ex:TI-2 a dul:TimeInterval ;
+    ti:hasIntervalStartDate "1799-5-11-02T00:00:00"^^xsd:dateTime ;
+    ti:hasIntervalEndDate "1799-11-09T00:00:00"^^xsd:dateTime .
+
+ex:GovernmentSituation_2 a dul:Situation, dul:Event ;
+    dul:satisfies ex:GovernmentDescription ;
+    dul:Time ex:TI-3 ;
+    dul:includesAgent dbr:French_First_Republic ; # French First Republic
+    dul:includesObject dbr:Triumvirate . # triumvirate
+
+dbr:Triumvirate rdfs:label "triumvirate" .
+
+ex:TI-3 a dul:TimeInterval ;
+    ti:hasIntervalStartDate "1799-11-09T00:00:00"^^xsd:dateTime ;
+    ti:hasIntervalEndDate "1804-05-18T00:00:00"^^xsd:dateTime .
+
+ex:StateChangeDescription a dul:Decription ;
+    dul:defines ex:TransitionEventType, ex:StateBefore, ex:StateAfter .
+
+ex:TransitionEventType a dul:EventType ;
+    dul:classifies dbr:Coup_of_18_Brumaire .
+ex:StateBefore a dul:EventType ;
+    dul:classifies ex:GovernmentSituation_1 .
+ex:StateAfter a dul:EventType ;
+    dul:classifies ex:GovernmentSituation_2 .
+
+ex:StateChangeSituation a dul:Situation ;
+    dul:satisfies ex:StateChangeDescription ;
+    dul:includesEvent dbr:Coup_of_18_Brumaire ;
+    dul:includesObject ex:GovernmentSituation_1, ex:GovernmentSituation_2 .
+
+
+# goal
+
+ex:Become_head_of_governement a dul:Description .
+
+ex:Coup_to_take_power_alone a dul:Plan ;
+    dul:hasComponent ex:Become_head_of_governement ;
+    dul:definesTask dbr:Coup_d%27état ; # coup
+    dul:definesRole ex:PowerUsurper .
+
+ex:PowerUsurper a dul:Role ;
+    dul:classifies dbr:Napoleon .  # Napoleon
+
+ex:NapoleonCoup18Brumaire a dul:PlanExecution ;
+    dul:satisfies ex:Coup_to_take_power_alone ;
+    dul:includesAction dbr:Coup_of_18_Brumaire ;  # Coup 18 Brumaire
+    dul:includesAgent dbr:Napoleon . # Napoleon
+
+# outcome-effect
+# cf. relations between events, transitions
+
+# perspective
+
+ex:EventSentimentInterpretationDescription a dul:Description ;
+    dul:defines ex:Interpreter, ex:Sentiment, ex:EventInterpreted .
+
+ex:Interpreter a dul:Role ;
+    dul:classifies dbr:Napoleon ; # Napoleon
+    dul:classifies dbr:Emmanuel_Joseph_Sieyès .
+ex:Sentiment a dul:Concept ;
+    dul:classifies ex:Satisfied, ex:Unsatisfied .
+ex:EventInterpreted a dul:EventType ;
+    dul:classifies dbr:Coup_of_18_Brumaire . # Coup of 18 Brumaire
+
+ex:Napoleon_18B_Interpretation a dul:Situation ;
+    dul:satisfies ex:EventSentimentInterpretationDescription ;
+    dul:includesAgent dbr:Napoleon ;
+    dul:includesObject ex:Satisfied ;
+    dul:includesEvent dbr:Coup_of_18_Brumaire .
+
+ex:Sieyes_18B_Interpretation a dul:Situation ;
+    dul:satisfies ex:EventSentimentInterpretationDescription ;
+    dul:includesAgent dbr:Emmanuel_Joseph_Sieyès ;  # Sieyes
+    dul:includesObject ex:Unsatisfied ;
+    dul:includesEvent dbr:Coup_of_18_Brumaire .
+
+
+# script  + storylines
+# description & situation, plan, goal, narrative

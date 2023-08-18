@@ -17,6 +17,11 @@ class MapKGs:
         self.generic_kg = generic_kg
         self.linguistic_kg = linguistic_kg
 
+        self.frame_prefix = 'https://w3id.org/framester/framenet/abox/frame/'
+        self.to_discard_frames = [
+            f"{self.frame_prefix}Event", f"{self.frame_prefix}Commonality" 
+        ]
+
     def __call__(self, nodes: List[str], cached: dict):
         """ Main mapping 
         - nodes: event types """
@@ -25,7 +30,9 @@ class MapKGs:
             node = nodes[i]
             if node not in cached:
                 eq_class_yago = self.generic_kg.get_equivalent_class_yago(node)
-                res[node] = self.linguistic_kg.get_frames([(node, eq_class_yago)])
+                res[node] = self.linguistic_kg.get_frames(
+                    nodes_info=[(node, eq_class_yago)],
+                    to_discard=self.to_discard_frames)
         res.update(cached)
         return res
 

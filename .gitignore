@@ -1,10 +1,7 @@
-build/*
-dist/*
-narrative_graph_representations.egg-info/*
-resources/*
-*.lp
-data/*
-settings/private.py
-src/framester/extract_info.py
 **/__pycache__/**
-cached/*.pkl
+build/*
+data/*
+dist/*
+misc/* 
+narrative_graph_representations.egg-info/*
+settings/private.py

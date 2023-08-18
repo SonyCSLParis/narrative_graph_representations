@@ -35,8 +35,9 @@ class HDTKG:
                 docs.extend(self.load_one_folder(folder_hdt=folder))
 
             else:
-                docs.extend([HDTDocument(os.path.join(folder, file)) for file in os.listdir(folder) \
-                    if fnmatch.fnmatch(file, "*.hdt")])
+                docs.extend([HDTDocument(os.path.join(folder, file)) \
+                    for file in os.listdir(folder) \
+                        if fnmatch.fnmatch(file, "*.hdt")])
         return docs
 
     def get_triples(self, **params: Dict) -> List[Tuple[str, str, str]]:
@@ -51,11 +52,6 @@ class HDTKG:
             triples.extend(curr_triples)
 
         return list(set(triples))
-    
-    def get_abstract(self, node: set) -> List[str]:
-        """ Retrieve abstract (text descriptions) of events """
-        params = {"subject": node, "predicate": self.config["abstract"]}
-        return [x[2] for x in self.get_triples(**params)]
 
     def get_type_node(self, node: str) -> List[str]:
         """ Retrieve type of nodes """
@@ -65,11 +61,14 @@ class HDTKG:
     def get_abstract(self, node: str, lang: str = 'en') -> List[str]:
         """ Retrieve abstract of event in `lang` """
         params = {"subject": node, "predicate": self.config["abstract"]}
-        return [x[2].replace(f"@{lang}", '')[1:-1] for x in self.get_triples(**params) if x[2].endswith(lang)]
+        return [x[2].replace(f"@{lang}", '')[1:-1] \
+            for x in self.get_triples(**params) if x[2].endswith(lang)]
 
     def get_equivalent_class_yago(self, node: str) -> List[str]:
         """ Map DBpedia YAGO IRI to YAGO Wordnet IRI (example below)
-        <http://dbpedia.org/class/yago/Ability105616246> <http://www.w3.org/2002/07/owl#equivalentClass> <http://yago-knowledge.org/resource/wordnet_ability_105616246> .
+        <http://dbpedia.org/class/yago/Ability105616246>
+        <http://www.w3.org/2002/07/owl#equivalentClass>
+        <http://yago-knowledge.org/resource/wordnet_ability_105616246> .
         """
         params = {"subject": node, "predicate": self.owl_equivalent_class}
         return [x[2] for x in self.get_triples(**params)]

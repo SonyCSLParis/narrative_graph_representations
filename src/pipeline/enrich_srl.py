@@ -35,7 +35,7 @@ class EnrichSRL:
         return "\t".join(res)
 
     @staticmethod
-    def update_role_text(text):
+    def update_role_text(text: str) -> str:
         """ Ensuring no value from role text column is empty """
         return text if text else "<unknown>"
 
@@ -44,10 +44,13 @@ class EnrichSRL:
         for (_, event_info) in tqdm(events_info.items()):
             if isinstance(event_info['srl'], pd.DataFrame):
                 # Spacy + DBpedia Spotlight
+                event_info['srl'].columns = \
+                    ['role_name', 'role_iri', 'role_text', 'role_name_iri', 'type_fes']
                 event_info['srl'] = event_info['srl'].fillna("")
-                event_info['srl']['role text'] = event_info['srl']['role text'].apply(self.update_role_text)
+                event_info['srl']['role_text'] = \
+                    event_info['srl']['role_text'].apply(self.update_role_text)
 
-                docs = self.nlp.pipe(event_info['srl']['role text'].values, n_process=4)
+                docs = self.nlp.pipe(event_info['srl']['role_text'].values, n_process=4)
                 docs = list(docs)
                 event_info['srl']['ds_iri'] = [self.ents_to_uri(doc.ents) for doc in docs]
         return events_info

@@ -2,10 +2,10 @@
 4th step of the pipeline: Add info related to frames in event info
 """
 # -*- coding: utf-8 -*-
+import pickle
 import argparse
 from types import NoneType
 import torch
-import pickle
 from tqdm import tqdm
 import numpy as np
 from sentence_transformers import util
@@ -13,7 +13,7 @@ from sentence_transformers import util
 from src.logger import Logger
 
 def main_combine(events_info: dict, map_info: dict, frame_info: dict) -> dict:
-    """ Main """
+    """ Main: merging info from frame and events """
     events = list(events_info.keys())
 
     for i in tqdm(range(len(events))):
@@ -26,7 +26,8 @@ def main_combine(events_info: dict, map_info: dict, frame_info: dict) -> dict:
                 if not isinstance(frame_info[frame]["description_embedding"], NoneType)]
 
         # Add frame similarity
-        if events_info[event]["frames_with_des"] and not isinstance(events_info[event]['description_embedding'], NoneType):
+        if events_info[event]["frames_with_des"] and \
+            not isinstance(events_info[event]['description_embedding'], NoneType):
             emb_event = events_info[event]['description_embedding']
             emb_frames = np.stack([frame_info[frame]['description_embedding'] \
                 for frame in events_info[event]["frames_with_des"]])
@@ -37,7 +38,9 @@ def main_combine(events_info: dict, map_info: dict, frame_info: dict) -> dict:
             name = events_info[event]["frames_with_des"][int(torch.argmax(similarities))]
             most_similar = {
                 'name': name, 'score': float(torch.max(similarities)),
-                'frame_elements': frame_info[name]["frame_elements"]
+                'frame_elements': frame_info[name]["frame_elements"],
+                'type_fes': frame_info[name]["type_fes"],
+                'comments': frame_info[name]["comments"]
             }
             events_info[event]["most_similar_frame"] = most_similar
 
@@ -55,7 +58,7 @@ if __name__ == '__main__':
     ap.add_argument('-o', "--output", required=True,
                     help="output path to save data")
     args_main = vars(ap.parse_args())
-    
+
     with open(args_main["events_info"], "rb") as openfile:
         EVENTS_INFO = pickle.load(openfile)
 
@@ -64,7 +67,7 @@ if __name__ == '__main__':
 
     with open(args_main["frame_info"], "rb") as openfile:
         FRAME_INFO = pickle.load(openfile)
-    
+
     LOGGER = Logger()
 
     LOGGER.log_start(name="Combine event and frame info")
@@ -73,4 +76,3 @@ if __name__ == '__main__':
 
     with open(args_main["output"], "wb") as openfile:
         pickle.dump(RES, openfile)
-

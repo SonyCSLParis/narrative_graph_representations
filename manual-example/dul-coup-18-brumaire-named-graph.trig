@@ -14,11 +14,12 @@
 @prefix faro: <http://purl.org/faro/> .
 @prefix sioc: <http://rdfs.org/sioc/ns#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
-@prefix wikipedia-en: <http://en.wikipedia.org/wiki/> .
 @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
 @prefix schema: <http://schema.org/> .
 @prefix F: <http://isweb.uni-koblenz.de/eventmodel/> . 
 @prefix prov: <http://www.w3.org/ns/prov#> . 
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix premon: <http://premon.fbk.eu/resource/> .
 
 
 ## DEFAULT GRAPH
@@ -26,21 +27,21 @@
 ###############################################
 
 ### EVENTS
-wd:Q620965 a dul:Action ;
+dbr:Coup_of_18_Brumaire a dul:Action ;
     rdfs:label "Coup of 18 Brumaire" ;
-    dul:hasParticipant wd:Q294344, wd:Q1663883, wd:Q333843, wd:Q1355402, wd:Q535515 ;
+    dul:hasParticipant dbr:Emmanuel_Joseph_Sieyès, dbr:Roger_Ducos, dbr:Paul_Barras, dbr:Louis-Jérôme_Gohier, wd:Q535515 ;
     dul:isObservableAt "1799-11-09:00:00:00Z"^^xsd:dateTime ;
-    dul:involvesAgent wd:Q517 ;
-    dul:hasLocation wd:Q142 .
+    dul:involvesAgent dbr:Napoleon ;
+    dul:hasLocation dbr:France .
 ex:Event_French_Directory a dul:Event ; # could even be dul:CollectiveAgent
-    prov:wasDerivedFrom wd:Q219817 ;
+    dul:associatedWith dbr:French_Directory ;
     rdfs:label "[E] French Directory" ;
     faro:immediatly_before ex:Event_French_Consulate .
 ex:Event_French_Consulate a dul:Event ;
-    prov:wasDerivedFrom wd:Q877619 ;
+    dul:associatedWith dbr:French_Consulate ;
     rdfs:label "[E] French Consulate" .
 ex:Event_French_First_Republic a dul:Event ; 
-    prov:wasDerivedFrom wd:Q58296 ;
+    dul:associatedWith dbr:French_First_Republic ;
     rdfs:label "[E] French First Republic" .
 ###############################################
 
@@ -48,9 +49,9 @@ ex:Event_French_First_Republic a dul:Event ;
 ex:ChangeOfLeadershipEventType a dul:EventType .
 F:Cause a dul:EventType .
 F:Effect a dul:EventType .
-wd:Q45382 a dul:EventType ;
+dbr:Coup_d%27état a dul:EventType ;
     rdfs:label "coup d'état" ;
-    dul:classifies wd:Q620965 .
+    dul:classifies dbr:Coup_of_18_Brumaire .
 ex:TransitionEventType a dul:EventType .
 ex:StateBefore a dul:EventType .
 ex:StateAfter a dul:EventType .
@@ -58,59 +59,73 @@ ex:EventInterpreted a dul:EventType .
 ##############################################
 
 ### PEOPLE
-wd:Q294344 a dul:Person ;
+dbr:Emmanuel_Joseph_Sieyès a dul:Person ;
     rdfs:label "Emmanuel Joseph Sieyès" .
-wd:Q1663883 a dul:Person ;
+dbr:Roger_Ducos a dul:Person ;
     rdfs:label "Roger Ducos" .
-wd:Q333843 a dul:Person ;
+dbr:Paul_Barras a dul:Person ;
     rdfs:label "Paul Barras" .
-wd:Q1355402 a dul:Person ;
+dbr:Louis-Jérôme_Gohier a dul:Person ;
     rdfs:label "Louis-Jérôme Gohier" .
 wd:Q535515 a dul:Person ;
     rdfs:label "Jean-François-Auguste Moulin" .
-wd:Q517 a dul:Person ;
+dbr:Napoleon a dul:Person ;
     rdfs:label "Napoleon" .
 ##############################################
 
 ### SOCIAL AGENTS
-ex:Body a dul:SocialAgent .
-ex:Old_order a dul:SocialAgent .
-ex:Selector a dul:SocialAgent .
-ex:Function a dul:SocialAgent .
-wd:Q1131971 a dul:SocialAgent ;
+wd:Q1131971 a dul:Concept ;
     rdfs:label "First Consul" .
 ex:SocialAgent_French_Directory a dul:SocialAgent ; 
-    prov:wasDerivedFrom wd:Q219817 ;
+    dul:associatedWith dbr:French_Directory ;
     rdfs:label "[SA] French Directory" .
-wd:Q3024240 a dul:SocialAgent ;
+dbr:HistoricalCountry a dul:SocialAgent ;
     rdfs:label "historical country" .
 ex:SocialAgent_French_First_Republic a dul:SocialAgent ;
-    prov:wasDerivedFrom wd:Q58296 ;
+    dul:associatedWith dbr:French_First_Republic ;
     rdfs:label "[SA] French First Republic" .
 ##############################################
 
 ### ROLES
-ex:New_leader a dul:Role .
-ex:Old_leader a dul:Role .
+<premon:fn17-change_of_leadership@new_leader> a dul:Role .
+<premon:fn17-change_of_leadership@old_leader> a dul:Role .
 ex:PowerUsurper a dul:Role .
 ex:Interpreter a dul:Role .
+<premon:fn17-change_of_leadership@old_order> a dul:Role .
+<premon:fn17-change_of_leadership@function> a dul:Role .
+##############################################
+
+### CONCEPTS
+wd:Q1131971 a dul:Concept ;
+    rdfs:label "First Consul" .
+dbr:Government a dul:Concept ;
+    rdfs:label "government" .
+dbr:Directorial_system a dul:Concept ;
+    rdfs:label "directorial system" .
+dbr:Triumvirate a dul:Concept ;
+    rdfs:label "triumvirate" .
+ex:Sentiment a dul:Concept .
 ##############################################
 
 ### DESCRIPTIONS
 ex:ChangeofLeadershipFrameDescription a dul:Description ;
-    dul:defines ex:New_leader, ex:Old_leader, ex:ChangeOfLeadershipEventType ;
-    dul:introduces ex:Function, ex:Old_order, ex:Selector, wd:Q1131971, ex:Body .
+    dul:definesRole <premon:fn17-change_of_leadership@new_leader>,
+        <premon:fn17-change_of_leadership@old_leader>,
+        <premon:fn17-change_of_leadership@old_order>,
+        <premon:fn17-change_of_leadership@function> ;
+    dul:defines ex:ChangeOfLeadershipEventType ;
+    dul:usesConcept wd:Q1131971 .
 ex:JustificationDescription a dul:Description ;
     dul:includesObject ex:Wikidata .
 ex:GovernmentDescription a dul:Description ;
-    dul:defines wd:P122; # basic form of government
-    dul:introduces wd:Q3024240 .  # historical country
+    dul:defines dbr:Government; # basic form of government
+    dul:introduces dbr:HistoricalCountry .  # historical country
 ex:StateChangeDescription a dul:Decription ;
     dul:defines ex:TransitionEventType, ex:StateBefore, ex:StateAfter .
 ex:Become_head_of_governement a dul:Description .
 ex:Coup_to_take_power_alone a dul:Plan ;
     dul:hasComponent ex:Become_head_of_governement ;
-    dul:definesTask wd:Q45382 ; # coup
+    dul:definesTask dbr:Coup_d%27état ; # coup
     dul:definesRole ex:PowerUsurper .
 ex:EventSentimentInterpretationDescription a dul:Description ;
     dul:defines ex:Interpreter, ex:Sentiment, ex:EventInterpreted .
@@ -128,24 +143,17 @@ ex:TI-3 a dul:TimeInterval ;
 ##############################################
 
 ### ENTITY (+ OBJECT, PLACE, CONCEPT)
-wd:Q219817 a dul:Entity ;
+dbr:French_Directory a dul:Entity ;
     rdfs:label "French Directory" .
-wd:Q877619 a dul:Entity ;
+dbr:French_Consulate a dul:Entity ;
     rdfs:label "French Consulate" .
 ex:Wikidata a dul:Object ;
     rdfs:label "Wikidata" .
-wd:Q142 a dul:Place ;
+dbr:France a dul:Place ;
     rdfs:label "France" .
-wd:Q15026 a dul:PhysicalObject ; 
+dbr:Chair a dul:PhysicalObject ; 
     rdfs:label "chair" ;
-    dul:isParticipantIn wd:Q620965 . 
-wd:P122 a dul:Concept ;
-    rdfs:label "basic form of government" .
-wd:Q2523556 a dul:Concept ;
-    rdfs:label "directorial system" .
-wd:Q83204 a dul:Concept ;
-    rdfs:label "triumvirate" .
-ex:Sentiment a dul:Concept .
+    dul:isParticipantIn dbr:Coup_of_18_Brumaire . 
 ##############################################
 
 ### FRAMESTER-RELATED
@@ -166,7 +174,7 @@ ex:Coup_of_18_Brumaire_Post a sioc:Post ;
 
 ex:sentence_1 a nif:Sentence ;
     rdf:value "The Coup d'état of 18 Brumaire overthrew the Directory." ;
-    schema:about wd:Q620965 .
+    schema:about dbr:Coup_of_18_Brumaire .
 ##############################################
 
 ## NAMED GRAPHS
@@ -174,25 +182,28 @@ ex:ChangeOfLeadershipFrameSituation_NG
 {
     ex:ChangeofLeadershipFrameSituation a dul:Situation ;
         dul:Time ex:TI-1 ;
-        dul:includesAction wd:Q620965 ; 
-        dul:includesAgent wd:Q517, wd:Q294344, wd:Q1663883, wd:Q333843, wd:Q1355402, wd:Q535515, wd:Q1131971,
+        dul:includesAction dbr:Coup_of_18_Brumaire ; 
+        dul:includesAgent dbr:Napoleon, dbr:Emmanuel_Joseph_Sieyès, dbr:Roger_Ducos, dbr:Paul_Barras, dbr:Louis-Jérôme_Gohier, wd:Q535515,
             ex:SocialAgent_French_Directory ; 
+        dul:includesObject wd:Q1131971;
         dul:satisfies ex:ChangeofLeadershipFrameDescription .
     # --- 
-    wd:Q517 dul:hasRole ex:New_leader .
-    wd:Q294344 dul:hasRole ex:Old_leader .
-    wd:Q1663883 dul:hasRole ex:Old_leader .
-    wd:Q333843 dul:hasRole ex:Old_leader .
-    wd:Q1355402 dul:hasRole ex:Old_leader .
-    wd:Q535515 dul:hasRole ex:Old_leader .
-    ex:ChangeOfLeadershipEventType dul:classifies wd:Q620965 .
-    ex:SocialAgent_French_Directory dul:associatedWith ex:Old_order .
-    wd:Q1131971 dul:associatedWith ex:Function .
+    dbr:Napoleon dul:hasRole <premon:fn17-change_of_leadership@new_leader> .
+    dbr:Emmanuel_Joseph_Sieyès dul:hasRole <premon:fn17-change_of_leadership@old_leader> .
+    dbr:Roger_Ducos dul:hasRole <premon:fn17-change_of_leadership@old_leader> .
+    dbr:Paul_Barras dul:hasRole <premon:fn17-change_of_leadership@old_leader> .
+    dbr:Louis-Jérôme_Gohier dul:hasRole <premon:fn17-change_of_leadership@old_leader> .
+    wd:Q535515 dul:hasRole <premon:fn17-change_of_leadership@old_leader> .
+    ex:ChangeOfLeadershipEventType dul:classifies dbr:Coup_of_18_Brumaire .
+    ex:SocialAgent_French_Directory dul:associatedWith <premon:fn17-change_of_leadership@old_order> .
+    wd:Q1131971 dul:hasRole <premon:fn17-change_of_leadership@function> .
+    <premon:fn17-change_of_leadership@function> a dul:Role ;
+        dul:classifies wd:Q1131971 .
 }
 
 ex:Event_French_Consulate_NG
 {
-    wd:Q1131971 dul:actsThrough wd:Q517
+    wd:Q1131971 dul:actsThrough dbr:Napoleon
 }
 
 
@@ -200,10 +211,10 @@ ex:EventCausalitySituation_1_NG
 {
     ex:EventCausalitySituation_1 a dul:Situation ;
         dul:satisfies F:EventCausalityDescription ;
-        dul:includesEvent wd:Q620965, ex:Event_French_Consulate ;
+        dul:includesEvent dbr:Coup_of_18_Brumaire, ex:Event_French_Consulate ;
         dul:includesObject ex:JustificationDescription .    
     # ---
-    F:Cause dul:classifies wd:Q620965 .
+    F:Cause dul:classifies dbr:Coup_of_18_Brumaire .
     F:Effect dul:classifies ex:Event_French_Consulate .
     ex:JustificationDescription dul:hasRole F:Justification .
 }
@@ -214,10 +225,10 @@ ex:GovernmentSituation_1_NG
         dul:satisfies ex:GovernmentDescription ;
         dul:Time ex:TI-2 ;
         dul:includesAgent ex:SocialAgent_French_First_Republic ; # French First Republic
-        dul:includesObject wd:Q2523556 . # directorial system
+        dul:includesObject dbr:Directorial_system . # directorial system
     # ---
-    ex:SocialAgent_French_First_Republic dul:associatedWith wd:Q3024240 .
-    wd:Q2523556 dul:associatedWith wd:P122
+    ex:SocialAgent_French_First_Republic dul:associatedWith dbr:HistoricalCountry .
+    dbr:Directorial_system dul:associatedWith dbr:Government
 }
 
 ex:GovernmentSituation_2_NG
@@ -225,20 +236,20 @@ ex:GovernmentSituation_2_NG
     ex:GovernmentSituation_2 a dul:Situation, dul:Event ;
         dul:satisfies ex:GovernmentDescription ;
         dul:Time ex:TI-3 ;
-        dul:includesAgent wd:Q58296 ; 
-        dul:includesObject wd:Q83204 . 
+        dul:includesAgent dbr:French_First_Republic ; 
+        dul:includesObject dbr:Triumvirate . 
     # ---
-    wd:Q83204 dul:associatedWith wd:P122 .
+    dbr:Triumvirate dul:associatedWith dbr:Government .
 }
 
 ex:StateChangeSituation
 {
     ex:StateChangeSituation a dul:Situation ;
         dul:satisfies dul:StateChangeDescription ;
-        dul:includesEvent wd:Q620965 ;
+        dul:includesEvent dbr:Coup_of_18_Brumaire ;
         dul:includesObject ex:GovernmentSituation_1, ex:GovernmentSituation_2 .
     # ---
-    ex:TransitionEventType dul:classifies wd:Q620965 .
+    ex:TransitionEventType dul:classifies dbr:Coup_of_18_Brumaire .
     ex:StateBefore dul:classifies ex:GovernmentSituation_1 .
     ex:StateAfter dul:classifies ex:GovernmentSituation_2 .
 }
@@ -247,34 +258,34 @@ ex:NapoleonCoup18Brumaire_NG
 {
     ex:NapoleonCoup18Brumaire a dul:PlanExecution ;
         dul:satisfies ex:Coup_to_take_power_alone ;
-        dul:includesAction wd:Q620965 ;  # Coup 18 Brumaire
-        dul:includesAgent wd:Q517 . # Napoleon
+        dul:includesAction dbr:Coup_of_18_Brumaire ;  # Coup 18 Brumaire
+        dul:includesAgent dbr:Napoleon . # Napoleon
     # ---
-    ex:PowerUsurper dul:classifies wd:Q517 .
+    ex:PowerUsurper dul:classifies dbr:Napoleon .
 }
 
 ex:Napoleon_18B_Interpretation_NG
 {
     ex:Napoleon_18B_Interpretation a dul:Situation ;
         dul:satisfies ex:EventSentimentInterpretationDescription ;
-        dul:includesAgent wd:Q517 ;
+        dul:includesAgent dbr:Napoleon ;
         dul:includesObject ex:Satisfied ;
-        dul:includesEvent wd:Q620965 .
+        dul:includesEvent dbr:Coup_of_18_Brumaire .
     # ---
-    ex:Interpreter dul:classifies wd:Q517 .
+    ex:Interpreter dul:classifies dbr:Napoleon .
     ex:Sentiment dul:associatedWith ex:Satisfied .
-    ex:EventInterpreted dul:classifies wd:Q620965 .
+    ex:EventInterpreted dul:classifies dbr:Coup_of_18_Brumaire .
 }
 
 ex:Sieyes_18B_Interpretation_NG
 {
     ex:Sieyes_18B_Interpretation a dul:Situation ;
         dul:satisfies ex:EventSentimentInterpretationDescription ;
-        dul:includesAgent wd:Q294344 ;  # Sieyes
+        dul:includesAgent dbr:Emmanuel_Joseph_Sieyès ;  # Sieyes
         dul:includesObject ex:Unsatisfied ;
-        dul:includesEvent wd:Q620965 .
+        dul:includesEvent dbr:Coup_of_18_Brumaire .
     # ---
-    ex:Interpreter dul:classifies wd:Q294344 .
+    ex:Interpreter dul:classifies dbr:Emmanuel_Joseph_Sieyès .
     ex:Sentiment dul:associatedWith ex:Unsatisfied .
-    ex:EventInterpreted dul:classifies wd:Q620965 .
+    ex:EventInterpreted dul:classifies dbr:Coup_of_18_Brumaire .
 }

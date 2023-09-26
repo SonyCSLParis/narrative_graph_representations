@@ -11,15 +11,14 @@
 @prefix framstersyn: <https://w3id.org/framester/data/framestersyn/> .
 @prefix framestercore: <https://w3id.org/framester/data/framestercore/> .
 @prefix framesterrole: <https://w3id.org/framester/data/framesterrole/agent> .
-@prefix framester-aboxfe: <https://w3id.org/framester/framenet/abox/fe/> .
 @prefix faro: <http://purl.org/faro/> .
 @prefix sioc: <http://rdfs.org/sioc/ns#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
-@prefix wikipedia-en: <http://en.wikipedia.org/wiki/> .
 @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
 @prefix schema: <http://schema.org/> .
 @prefix F: <http://isweb.uni-koblenz.de/eventmodel/> . 
 @prefix dbr: <http://dbpedia.org/resource/> .
+@prefix premon: <http://premon.fbk.eu/resource/> .
 
 # agent
 
@@ -63,21 +62,22 @@ dbr:Napoleon a dul:Person ;
 ## Description: template
 ex:ChangeofLeadershipFrameDescription a dul:Description ;
     # core
-    dul:definesRole framester-aboxfe:New_leader, framester-aboxfe:Old_leader, framester-aboxfe:Function,
-        framester-aboxfe:Old_order ;
-    dul:defines framester-aboxfe:ChangeOfLeadershipEventType .
+    dul:definesRole <premon:fn17-change_of_leadership@new_leader>,      <premon:fn17-change_of_leadership@old_leader>,   <premon:fn17-change_of_leadership@function>,
+        <premon:fn17-change_of_leadership@old_order> ;
+    dul:defines ex:ChangeOfLeadershipEventType ;
+    dul:usesConcept wd:Q1131971 .
     
 wd:Q1131971 a dul:Concept ;
     rdfs:label "First Consul" .
-framester-aboxfe:New_leader a dul:Role ;
+<premon:fn17-change_of_leadership@new_leader> a dul:Role ;
     dul:classifies dbr:Napoleon .
-framester-aboxfe:Old_leader a dul:Role ;
+<premon:fn17-change_of_leadership@old_leader> a dul:Role ;
     dul:classifies dbr:Emmanuel_Joseph_Sieyès, dbr:Roger_Ducos, dbr:Paul_Barras, dbr:Louis-Jérôme_Gohier, wd:Q535515 .
-framester-aboxfe:Old_order a dul:Role ;
+<premon:fn17-change_of_leadership@old_order> a dul:Role ;
     dul:classifies ex:SocialAgent_French_Directory .
-framester-aboxfe:Function a dul:Role ;
+<premon:fn17-change_of_leadership@function> a dul:Role ;
     dul:classifies wd:Q1131971 .
-framester-aboxfe:ChangeOfLeadershipEventType a dul:EventType ;
+ex:ChangeOfLeadershipEventType a dul:EventType ;
     dul:classifies dbr:Coup_of_18_Brumaire .
 
 ex:TI-1 a dul:TimeInterval ;
